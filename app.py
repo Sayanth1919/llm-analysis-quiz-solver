@@ -32,12 +32,24 @@ LLM_API_KEY = os.getenv("LLM_API_KEY")
 LLM_BASE_URL = os.getenv("LLM_BASE_URL", "https://api.openai.com/v1") 
 
 # --- Initialize LLM Client ---
+if 'http_proxy' in os.environ:
+    del os.environ['http_proxy']
+if 'https_proxy' in os.environ:
+    del os.environ['https_proxy']
+if 'HTTP_PROXY' in os.environ:
+    del os.environ['HTTP_PROXY']
+if 'HTTPS_PROXY' in os.environ:
+    del os.environ['HTTPS_PROXY']
+
+# --- Initialize LLM Client ---
 if not LLM_API_KEY:
     logging.warning("LLM_API_KEY not found. LLM calls will fail unless configured.")
 
-# Initialize the client with the specified base URL and API Key
-# This handles the AI Pipe setup if LLM_BASE_URL is set correctly.
-LLM_CLIENT = AsyncOpenAI(api_key=LLM_API_KEY, base_url=LLM_BASE_URL)
+LLM_CLIENT = AsyncOpenAI(
+    api_key=LLM_API_KEY, 
+    base_url=LLM_BASE_URL
+    # Note: We are now GUARANTEEING 'proxies' is not passed by cleaning the environment
+)
 LLM_MODEL = "gpt-4-turbo-preview" # A highly capable model is recommended
 
 # Ensure required configuration is available
