@@ -1,0 +1,12 @@
+Flask
+requests
+python-dotenv
+openai
+playwright
+gunicorn
+beautifulsoup4
+lxml
+pandas
+pdfplumber
+matplotlib
+pillow
