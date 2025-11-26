@@ -1,7 +1,7 @@
 Flask
 requests
 python-dotenv
-openai==1.14.3
+openai==1.25.0
 playwright
 gunicorn
 beautifulsoup4
