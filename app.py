@@ -13,7 +13,9 @@ import requests
 from playwright.async_api import async_playwright
 from openai import AsyncOpenAI # pip install openai
 import logging
-
+from openai._base_client import DEFAULT_TIMEOUT
+from openai._base_client import AsyncHttpxClientWrapper
+import httpx
 # Set up logging level for better output
 logging.basicConfig(level=logging.INFO)
 
@@ -45,10 +47,25 @@ if 'HTTPS_PROXY' in os.environ:
 if not LLM_API_KEY:
     logging.warning("LLM_API_KEY not found. LLM calls will fail unless configured.")
 
+# CRITICAL FIX: Manually create the internal HTTP client to bypass the 'proxies' TypeError.
+custom_httpx_client = httpx.AsyncClient(
+    base_url=LLM_BASE_URL,
+    timeout=DEFAULT_TIMEOUT,
+    # IMPORTANT: Do not pass proxies=... here, as that's what caused the TypeError.
+)
+
+# Initialize the custom wrapper
+custom_wrapper = AsyncHttpxClientWrapper(
+    http_client=custom_httpx_client,
+    timeout=DEFAULT_TIMEOUT,
+)
+
+# Initialize the OpenAI client using the custom wrapper
 LLM_CLIENT = AsyncOpenAI(
     api_key=LLM_API_KEY, 
-    base_url=LLM_BASE_URL
-    # Note: We are now GUARANTEEING 'proxies' is not passed by cleaning the environment
+    base_url=LLM_BASE_URL,
+    # Pass the explicitly created client wrapper instance
+    http_client=custom_wrapper 
 )
 LLM_MODEL = "gpt-4-turbo-preview" # A highly capable model is recommended
 
