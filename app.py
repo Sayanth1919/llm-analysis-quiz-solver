@@ -43,29 +43,16 @@ if 'HTTP_PROXY' in os.environ:
 if 'HTTPS_PROXY' in os.environ:
     del os.environ['HTTPS_PROXY']
 
+
 # --- Initialize LLM Client ---
 if not LLM_API_KEY:
     logging.warning("LLM_API_KEY not found. LLM calls will fail unless configured.")
 
-# CRITICAL FIX: Manually create the internal HTTP client to bypass the 'proxies' TypeError.
-custom_httpx_client = httpx.AsyncClient(
-    base_url=LLM_BASE_URL,
-    timeout=DEFAULT_TIMEOUT,
-    # IMPORTANT: Do not pass proxies=... here, as that's what caused the TypeError.
-)
-
-# Initialize the custom wrapper
-custom_wrapper = AsyncHttpxClientWrapper(
-    http_client=custom_httpx_client,
-    timeout=DEFAULT_TIMEOUT,
-)
-
-# Initialize the OpenAI client using the custom wrapper
+# Initialize the OpenAI client using the simplest form possible.
+# By cleaning the OS environment variables above, we prevent the TypeError.
 LLM_CLIENT = AsyncOpenAI(
     api_key=LLM_API_KEY, 
-    base_url=LLM_BASE_URL,
-    # Pass the explicitly created client wrapper instance
-    http_client=custom_wrapper 
+    base_url=LLM_BASE_URL
 )
 LLM_MODEL = "gpt-4-turbo-preview" # A highly capable model is recommended
 
