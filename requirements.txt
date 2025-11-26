@@ -7,6 +7,6 @@ gunicorn
 beautifulsoup4
 lxml
 pandas
-pdfplumber
+pdfplumber==0.10.4
 matplotlib
 pillow
