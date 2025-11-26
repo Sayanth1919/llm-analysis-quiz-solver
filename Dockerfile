@@ -8,13 +8,18 @@ WORKDIR /app
 # Copy the Python dependency files
 COPY requirements.txt .
 
-# Install Python packages
+# --- CRITICAL FIX: Install Python's package manager (pip) ---
+# The base image has Python 3 but often lacks the pip module, causing the "No module named pip" error.
+# This command updates the package list and installs python3-pip.
+RUN apt-get update && apt-get install -y python3-pip
+
+# Install Python packages using the corrected command
 RUN python3 -m pip install --no-cache-dir -r requirements.txt
+
 # Copy the entire application code
 COPY . .
 
 # Cloud services expose environment variable PORT (e.g., 8080 or 10000).
-# Gunicorn must be told to listen on this port.
 # We expose a default port (8080) for container configuration.
 EXPOSE 8080
 
