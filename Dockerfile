@@ -26,4 +26,4 @@ EXPOSE 8080
 # Define the command to run the production-grade server (Gunicorn)
 # The server listens on 0.0.0.0 and uses the port provided by the hosting service (defaulting to 8080).
 # 'app:app' means run the Flask app instance named 'app' from the file 'app.py'
-CMD ["gunicorn", "--bind", "0.0.0.0:$PORT", "app:app"]
+CMD gunicorn --bind 0.0.0.0:$PORT app:app
